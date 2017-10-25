@@ -34,5 +34,5 @@ $.getJSON( "files/maps/map1.json", function(data) {
     setInterval(function(){
         char.physics.vx = 10 - Math.random() * 20;
         char.physics.vy = 10 - Math.random() * 20;
-    }, 500 + Math.random()*200)
+    }, 1000 + Math.random()*200)
 });
