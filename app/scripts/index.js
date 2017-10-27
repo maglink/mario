@@ -14,25 +14,12 @@ game.Run(1000/30);
 
 $.getJSON( "files/maps/map1.json", function(data) {
     game.world.LoadMap(data, 'files/maps/');
-    game.renderer.camera.SetZoom(0.7);
+    game.renderer.camera.SetZoom(3);
 
-    var char = game.world.AddBody({
-        x: 11,
-        y: -7,
-        width: 0.9999999,
-        height: 1.5
-    });
+    var char = game.world.AddBody();
+    game.world.SetBodyPositionByZone(char, "player");
 
+    game.renderer.camera.SetPositionByBody(char);
     game.renderer.camera.Follow(char);
 
-    //char.physics.vx = 5 - Math.random() * 10;
-    //char.physics.vy = 5 - Math.random() * 10;
-
-    //char.physics.vx = 0.1;
-    //char.physics.vy = -3;
-
-    setInterval(function(){
-        char.physics.vx = 10 - Math.random() * 20;
-        char.physics.vy = 10 - Math.random() * 20;
-    }, 1000 + Math.random()*200)
 });

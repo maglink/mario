@@ -14,8 +14,17 @@ module.exports = function() {
         _self.targetX = x;
         _self.targetY = y;
         if(!smooth) {
-            _self.x = x;
-            _self.y = y;
+            _self.x = _self.targetX;
+            _self.y = _self.targetY;
+        }
+    };
+
+    _self.SetPositionByBody = function(body, smooth) {
+        _self.targetX = body.physics.x + body.physics.width/2;
+        _self.targetY = body.physics.y - body.physics.height/2;
+        if(!smooth) {
+            _self.x = _self.targetX;
+            _self.y = _self.targetY;
         }
     };
 

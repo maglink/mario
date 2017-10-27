@@ -7,7 +7,7 @@ module.exports = function(ctx, world) {
     _self.world = world;
     _self.camera = new Camera();
 
-    _self.isDebug = true;
+    _self.isDebug = false;
 
     _self.textures = {};
 
@@ -28,8 +28,21 @@ module.exports = function(ctx, world) {
     _self.update = function () {
         _self.camera.update();
         _self.ctx.clearRect(0, 0, _self.ctx.canvas.width, _self.ctx.canvas.height);
+        _self.ctx.imageSmoothingEnabled = false;
+        _self.drawBackground();
         _self.drawGrid();
         _self.drawBodies();
+    };
+
+    _self.drawBackground = function () {
+        var map = _self.world.map;
+        if(map.backgroundcolor){
+            _self.ctx.beginPath();
+            _self.ctx.rect(0, 0, _self.ctx.canvas.width, _self.ctx.canvas.height);
+            _self.ctx.fillStyle = map.backgroundcolor;
+            _self.ctx.fill();
+            _self.ctx.closePath();
+        }
     };
 
     _self.drawBodies = function () {
@@ -96,33 +109,40 @@ module.exports = function(ctx, world) {
                 endJ = map.grid[i].length
             }
             for(var j=startJ;j<endJ;j++){
-                var cell = map.grid[i][j];
-                if(!cell || !cell.image) {
-                    continue
-                }
-
-                var texture = _self.getTexture(cell.image);
-                var x = j*map.tilewidth;
-                var y = -1*i*map.tileheight;
-
-                _self.ctx.drawImage(
-                    texture,
-                    _self.ctx.canvas.width/2 + (x - _self.camera.x*map.tilewidth) * _self.camera.zoomRate,
-                    _self.ctx.canvas.height/2 - (y - _self.camera.y*map.tileheight) * _self.camera.zoomRate,
-                    map.tilewidth * _self.camera.zoomRate,
-                    map.tileheight * _self.camera.zoomRate
-                );
-
-                if(_self.isDebug) {
-                    _self.ctx.font = "10px Comic Sans MS";
-                    _self.ctx.fillStyle = "black";
-                    _self.ctx.textAlign = "center";
-                    _self.ctx.fillText("(" + i + "," + j + ")",
-                        _self.ctx.canvas.width/2 + (x - _self.camera.x*map.tilewidth) * _self.camera.zoomRate + map.tilewidth * _self.camera.zoomRate/2,
-                        _self.ctx.canvas.height/2 - (y - _self.camera.y*map.tileheight) * _self.camera.zoomRate + map.tileheight * _self.camera.zoomRate/2
-                    );
-                }
+                _self.drawGridCell(map.back, i, j);
+                _self.drawGridCell(map.grid, i, j);
             }
+        }
+    };
+
+    _self.drawGridCell = function (grid, i, j) {
+        var map = _self.world.map;
+
+        if(!grid || !grid[i] || !grid[i][j] || !grid[i][j].image) {
+            return
+        }
+
+        var cell = grid[i][j];
+        var texture = _self.getTexture(cell.image);
+        var x = j*map.tilewidth;
+        var y = -1*i*map.tileheight;
+
+        _self.ctx.drawImage(
+            texture,
+            _self.ctx.canvas.width/2 + (x - _self.camera.x*map.tilewidth) * _self.camera.zoomRate,
+            _self.ctx.canvas.height/2 - (y - _self.camera.y*map.tileheight) * _self.camera.zoomRate,
+            map.tilewidth * _self.camera.zoomRate,
+            map.tileheight * _self.camera.zoomRate
+        );
+
+        if(_self.isDebug) {
+            _self.ctx.font = "10px Arial";
+            _self.ctx.fillStyle = "black";
+            _self.ctx.textAlign = "center";
+            _self.ctx.fillText("(" + i + "," + j + ")",
+                _self.ctx.canvas.width/2 + (x - _self.camera.x*map.tilewidth) * _self.camera.zoomRate + map.tilewidth * _self.camera.zoomRate/2,
+                _self.ctx.canvas.height/2 - (y - _self.camera.y*map.tileheight) * _self.camera.zoomRate + map.tileheight * _self.camera.zoomRate/2
+            );
         }
     };
 
