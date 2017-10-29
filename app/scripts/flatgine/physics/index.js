@@ -7,8 +7,15 @@ module.exports = function(world) {
     _self.timeFrequency = 1000/30;
     _self.timeRate = 1;
     _self.defaultBounce = 0.02;
-    _self.defaultFriction = 0.1;
+    _self.defaultFriction = 0.2;
     _self.defaultDensity = 1;
+
+    _self.beforeHandlers = [];
+    _self.Before = function(handler) {
+        if(typeof handler === 'function') {
+            _self.beforeHandlers.push(handler);
+        }
+    };
 
     _self.setTimeFrequency = function(frequency) {
         _self.timeFrequency = frequency;
@@ -19,6 +26,8 @@ module.exports = function(world) {
     };
 
     _self.update = function () {
+        _self.beforeHandlers.forEach(function (handler) { handler(); });
+
         var bodies = _self.world.bodies;
         Object.keys(bodies).forEach(function (id) {
             var body = bodies[id].physics;
@@ -27,46 +36,48 @@ module.exports = function(world) {
                 return;
             }
 
-            var oldCoords = {
-                x: body.x,
-                y: body.y
-            };
+            _self.applyGravity(body);
 
-            if(!body.sleep) {
-                body.density = body.density ? body.density : _self.defaultDensity;
-                body.vy += -(_self.gravity*body.density)/_self.getPieceOfTime();
+            var dx = body.vx/_self.getPieceOfTime();
+            var dy = body.vy/_self.getPieceOfTime();
+
+            var maxD = 0.49999999;
+
+            if(dx > maxD) dx = maxD;
+            if(dx < -maxD) dx = -maxD;
+            if(dy > maxD) dy = maxD;
+            if(dy < -maxD) dy = -maxD;
+
+            var collision;
+            var resolveResult;
+
+            body.x += dx;
+            _self.checkCollisions(body, 'x');
+            collision = _self.checkGridCollisions(body);
+            if(collision) {
+                resolveResult = _self.resolveGridCollision(body, collision, 'x');
+                _self.emitEvent(bodies[id], 'onGridTouch', resolveResult)
             }
 
-            if(body.vx || body.vy) {
-                var dx = body.vx/_self.getPieceOfTime();
-                var dy = body.vy/_self.getPieceOfTime();
-
-                var maxD = 0.49999999;
-
-                if(dx > maxD) dx = maxD;
-                if(dx < -maxD) dx = -maxD;
-                if(dy > maxD) dy = maxD;
-                if(dy < -maxD) dy = -maxD;
-
-                var collision;
-
-                body.x += dx;
-                _self.checkCollisions(body, 'x');
-                collision = _self.checkGridCollisions(body);
-                if(collision) {
-                    _self.resolveGridCollision(body, collision, 'x');
-                }
-
-                body.y += dy;
-                _self.checkCollisions(body, 'y');
-                collision = _self.checkGridCollisions(body);
-                if(collision) {
-                    _self.resolveGridCollision(body, collision, 'y');
-                }
-
-                body.sleep = oldCoords.x === body.x && oldCoords.y === body.y;
+            body.y += dy;
+            _self.checkCollisions(body, 'y');
+            collision = _self.checkGridCollisions(body);
+            if(collision) {
+                resolveResult = _self.resolveGridCollision(body, collision, 'y');
+                _self.emitEvent(bodies[id], 'onGridTouch', resolveResult)
             }
         })
+    };
+
+    _self.emitEvent = function(body, eventName, eventData) {
+        body.eventsListeners[eventName].forEach(function(handler) {
+            handler(eventData)
+        })
+    };
+
+    _self.applyGravity = function (body) {
+        body.density = body.density ? body.density : _self.defaultDensity;
+        body.vy += -(_self.gravity*body.density)/_self.getPieceOfTime();
     };
 
     _self.checkCollisions = function(body, axis) {
@@ -192,11 +203,15 @@ module.exports = function(world) {
 
         var gap = 0.00000000001;
 
+        var side;
+
         if(axis === 'x') {
             if(bodyCenter.x < cellCenter.x) {
                 body.x = cellBody.x - body.width - gap;
+                side = 'right';
             } else {
                 body.x = cellBody.x + cellBody.width + gap;
+                side = 'left';
             }
             body.vy *= 1 - _self.getFriction(body, cellBody);
             body.vx *= -1 * _self.getBounce(body, cellBody);
@@ -206,12 +221,20 @@ module.exports = function(world) {
         if(axis === 'y') {
             if(bodyCenter.y > cellCenter.y) {
                 body.y = cellBody.y + body.height + gap;
+                side = 'bottom';
             } else {
                 body.y = cellBody.y - cellBody.height - gap;
+                side = 'top';
             }
             body.vx *= 1 - _self.getFriction(body, cellBody);
             body.vy *= -1 * _self.getBounce(body, cellBody);
             body.vy = Math.floor(Math.abs(body.vy)*100) === 0 ? 0 : body.vy;
+        }
+
+        return {
+            cell: collision.cell,
+            axis: axis,
+            side: side
         }
     };
 
@@ -229,10 +252,10 @@ module.exports = function(world) {
     _self.getFriction = function(body, other) {
         var friction = _self.defaultFriction;
         if(body.friction && other.friction) {
-            friction = body.friction > other.friction ? body.friction : other.friction;
+            friction = body.friction < other.friction ? body.friction : other.friction;
         } else {
-            friction = body.friction ? body.friction : friction;
-            friction = other.friction ? other.friction : friction;
+            friction = typeof body.friction === 'number' ? body.friction : friction;
+            friction = typeof other.friction === 'number' ? other.friction : friction;
         }
         return friction
     };

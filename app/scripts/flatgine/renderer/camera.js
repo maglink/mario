@@ -5,6 +5,8 @@ module.exports = function() {
     _self.x = 0;
     _self.y = 0;
     _self.followObject = null;
+    _self.followSmooth = true;
+    _self.followOffset = {};
     _self.frequency = 1000/30;
     _self.smoothTimeout = 500;
     _self.targetX = _self.x;
@@ -32,8 +34,10 @@ module.exports = function() {
         _self.zoomRate = zoomRate;
     };
 
-    _self.Follow = function(body) {
+    _self.Follow = function(body, smooth, offset) {
         _self.followObject = body;
+        _self.followSmooth = smooth;
+        _self.followOffset = offset || {};
     };
 
     _self.SetSmoothTimeout = function(timeout) {
@@ -46,8 +50,12 @@ module.exports = function() {
 
     _self.update = function() {
         if(_self.followObject) {
-            _self.targetX = _self.followObject.physics.x + _self.followObject.physics.width/2;
-            _self.targetY = _self.followObject.physics.y - _self.followObject.physics.height/2;
+            _self.targetX = _self.followObject.physics.x + _self.followObject.physics.width/2 + (_self.followOffset.x || 0);
+            _self.targetY = _self.followObject.physics.y - _self.followObject.physics.height/2 + (_self.followOffset.y || 0);
+            if(!_self.followSmooth) {
+                _self.x = _self.targetX;
+                _self.y = _self.targetY;
+            }
         }
 
         var vx = _self.targetX - _self.x;

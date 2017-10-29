@@ -3,15 +3,16 @@ module.exports = function(game) {
 
     _self.game = game;
 
-    _self.bodyIdCounter = 0;
-    _self.bodies = {};
-
     _self.AddBody = function(options) {
         options = options || {};
         var id = "body_" + _self.bodyIdCounter++;
         var gap = 0.00000000001;
         var body = {
             id: id,
+            eventsListeners: {
+                onGridTouch: [],
+                onObjectTouch: []
+            },
             physics: {
                 isStatic: options.isStatic,
                 x: options.x || 0,
@@ -25,15 +26,36 @@ module.exports = function(game) {
                 friction: options.friction
             },
             renderer: {
+                color: options.color,
                 image: options.image,
-                flip: options.flip
+                flip: options.flip,
+                angle: options.angle,
+                xOffset: options.xOffset || 0,
+                yOffset: options.yOffset || 0,
+                xScale: options.xScale || 1,
+                yScale: options.yScale || 1
             }
         };
         if(options.mass) {
             body.physics.density = body.mass/body.physics.width*body.physics.height;
         }
+        if(typeof body.renderer.image === 'string') {
+            _self.game.renderer.LoadImage(body.renderer.image);
+        }
         _self.bodies[id] = body;
         return body;
+    };
+
+    _self.RemoveBody = function(body) {
+        delete _self.bodies[body.id];
+    };
+
+    _self.AddBodyEventListener = function(body, eventName, handler) {
+        if(typeof handler !== 'function' || !body.eventsListeners[eventName]){
+            return null;
+        }
+        body.eventsListeners[eventName].push(handler);
+        return true;
     };
 
     _self.LoadMap = function (mapData, texturePrefix) {
@@ -63,6 +85,8 @@ module.exports = function(game) {
             }
 
             _self.map = map;
+            _self.bodyIdCounter = 0;
+            _self.bodies = {};
         } catch (err) {
             return err;
         }
@@ -101,8 +125,13 @@ module.exports = function(game) {
                 _self.game.renderer.LoadImage(imageUrl);
 
                 map.grid[i][j] = {
-                    image: imageUrl
+                    image: imageUrl,
+                    type: tiles[tileType].type
                 };
+
+                if(map.grid[i][j].type === 'invisible') {
+                    map.grid[i][j].image = null
+                }
             }
         }
     };
@@ -124,7 +153,8 @@ module.exports = function(game) {
                 _self.game.renderer.LoadImage(imageUrl);
 
                 map.back[i][j] = {
-                    image: imageUrl
+                    image: imageUrl,
+                    type: tiles[tileType].type
                 };
             }
         }
@@ -157,6 +187,18 @@ module.exports = function(game) {
         }
     };
 
+    _self.GetGridBlocksByType = function (type) {
+        var grid = _self.map.grid;
+        var resultList = [];
+        for(var i=0;i<grid.length;i++) {
+            for (var j = 0; j < grid[i].length; j++) {
+                if(grid[i][j] && grid[i][j].type === type) {
+                    resultList.push(grid[i][j])
+                }
+            }
+        }
+        return resultList;
+    };
 
     return _self;
 };

@@ -1,4 +1,5 @@
 var Camera = require('./camera');
+var Animation = require('./animation');
 
 module.exports = function(ctx, world) {
     var _self = this;
@@ -6,16 +7,28 @@ module.exports = function(ctx, world) {
     _self.ctx = ctx;
     _self.world = world;
     _self.camera = new Camera();
+    _self.animation = Animation(_self);
 
     _self.isDebug = false;
-
+    _self.beforeHandlers = [];
     _self.textures = {};
 
     _self.LoadImage = function (imageUrl) {
         _self.getTexture(imageUrl);
+        return imageUrl;
+    };
+
+    _self.BeforeRender = function(handler) {
+        if(typeof handler === 'function') {
+            _self.beforeHandlers.push(handler);
+        }
     };
 
     _self.getTexture = function(path) {
+        if(typeof path === 'object') {
+            path = path.GetCurrentImage()
+        }
+
         if(_self.textures[path]) {
             return _self.textures[path]
         }
@@ -27,6 +40,9 @@ module.exports = function(ctx, world) {
 
     _self.update = function () {
         _self.camera.update();
+
+        _self.beforeHandlers.forEach(function (handler) { handler(); });
+
         _self.ctx.clearRect(0, 0, _self.ctx.canvas.width, _self.ctx.canvas.height);
         _self.ctx.imageSmoothingEnabled = false;
         _self.drawBackground();
@@ -52,16 +68,38 @@ module.exports = function(ctx, world) {
         Object.keys(bodies).forEach(function (id) {
             var body = bodies[id];
 
-            var x = _self.ctx.canvas.width/2 + (body.physics.x - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
-            var y = _self.ctx.canvas.height/2 - (body.physics.y - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
-            var width = body.physics.width * map.tilewidth * _self.camera.zoomRate;
-            var height = body.physics.height * map.tileheight * _self.camera.zoomRate;
+            if(body.renderer.image) {
+                var texture = _self.getTexture(body.renderer.image);
 
-            _self.ctx.beginPath();
-            _self.ctx.rect(x, y, width, height);
-            _self.ctx.fillStyle = body.renderer.color || "#5574ff";
-            _self.ctx.fill();
-            _self.ctx.closePath();
+                var x = _self.ctx.canvas.width/2 + ((body.physics.x+body.physics.width/2) - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
+                var y = _self.ctx.canvas.height/2 - ((body.physics.y-body.physics.height/2) - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
+
+                _self.ctx.translate(x, y);
+                if(body.renderer.angle) {
+                    _self.ctx.rotate(body.renderer.angle);
+                }
+                if(body.renderer.flip) {
+                    _self.ctx.scale(-1, 1);
+                }
+                //-----------
+                _self.ctx.drawImage(
+                    texture,
+                    (-texture.width/2 + body.renderer.xOffset) * body.renderer.xScale * _self.camera.zoomRate,
+                    (-texture.height/2 + body.renderer.yOffset) * body.renderer.yScale * _self.camera.zoomRate,
+                    texture.width * body.renderer.xScale * _self.camera.zoomRate,
+                    texture.height * body.renderer.yScale * _self.camera.zoomRate
+                );
+                //-----------
+                if(body.renderer.flip) {
+                    _self.ctx.scale(-1, 1);
+                }
+                if(body.renderer.angle) {
+                    _self.ctx.rotate(-body.renderer.angle);
+                }
+                _self.ctx.translate(-x, -y);
+            } else {
+                _self.drawBodyRectangle(body)
+            }
 
             if(_self.isDebug) {
                 var centerX = x+width/2;
@@ -83,6 +121,19 @@ module.exports = function(ctx, world) {
                 _self.ctx.stroke();
             }
         })
+    };
+
+    _self.drawBodyRectangle = function (body) {
+        var x = _self.ctx.canvas.width/2 + (body.physics.x - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
+        var y = _self.ctx.canvas.height/2 - (body.physics.y - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
+        var width = body.physics.width * map.tilewidth * _self.camera.zoomRate;
+        var height = body.physics.height * map.tileheight * _self.camera.zoomRate;
+
+        _self.ctx.beginPath();
+        _self.ctx.rect(x, y, width, height);
+        _self.ctx.fillStyle = body.renderer.color || "#5574ff";
+        _self.ctx.fill();
+        _self.ctx.closePath();
     };
 
     _self.drawGrid = function () {
