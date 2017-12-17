@@ -1,5 +1,5 @@
 module.exports = function(game) {
-    game.sounds.masterVolume = 0;
+    game.sounds.masterVolume = 1;
     game.sounds.AddBackgroundMusic('main_theme', 'files/music/01-main-theme-overworld.mp3', 0.5);
     game.sounds.AddBackgroundMusic('underworld', 'files/music/02-underworld.mp3', 0.5);
     game.sounds.AddBackgroundMusic('starman', 'files/music/05-starman.mp3', 0.5);
