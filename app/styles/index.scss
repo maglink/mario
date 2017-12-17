@@ -22,3 +22,8 @@ body {
 #ui > #header {
   margin: 30px;
 }
+
+#ui > #header > div {
+  width: 30%;
+  display: inline-block;
+}

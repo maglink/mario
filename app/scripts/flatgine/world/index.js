@@ -9,11 +9,16 @@ module.exports = function(game) {
         var gap = 0.00000000001;
         var body = {
             id: id,
+            type: options.type,
             eventsListeners: {
+                onDestroy: [],
                 onGridTouch: [],
-                onObjectTouch: []
+                onObjectTouch: [],
+                onZoneIn: [],
+                onZoneOut: []
             },
             physics: {
+                id: id,
                 isStatic: options.isStatic,
                 x: options.x || 0,
                 y: options.y || 0,
@@ -23,7 +28,8 @@ module.exports = function(game) {
                 height: options.height-gap || 1-gap,
                 density: options.density,
                 bounce: options.bounce,
-                friction: options.friction
+                friction: options.friction,
+                noCollideObjects: options.noCollideObjects
             },
             renderer: {
                 color: options.color,
@@ -33,7 +39,8 @@ module.exports = function(game) {
                 xOffset: options.xOffset || 0,
                 yOffset: options.yOffset || 0,
                 xScale: options.xScale || 1,
-                yScale: options.yScale || 1
+                yScale: options.yScale || 1,
+                front: false
             }
         };
         if(options.mass) {
@@ -47,7 +54,18 @@ module.exports = function(game) {
     };
 
     _self.RemoveBody = function(body) {
-        delete _self.bodies[body.id];
+        if(_self.bodies[body.id]) {
+            _self.bodies[body.id].eventsListeners.onDestroy.forEach(function (handler) {
+                handler()
+            });
+            delete _self.bodies[body.id];
+        }
+    };
+
+    _self.RemoveCell = function(cell) {
+        if(cell && _self.map.grid[-cell.y]) {
+            _self.map.grid[-cell.y][cell.x] = null;
+        }
     };
 
     _self.AddBodyEventListener = function(body, eventName, handler) {
@@ -100,6 +118,7 @@ module.exports = function(game) {
             var start = tileset.firstgid;
             Object.keys(tileset.tiles).forEach(function(key){
                 var tile = tileset.tiles[key];
+                tile.properties = tileset.tileproperties[key];
                 key = Number(key);
                 tiles[start+key] = tile;
             })
@@ -125,8 +144,11 @@ module.exports = function(game) {
                 _self.game.renderer.LoadImage(imageUrl);
 
                 map.grid[i][j] = {
+                    x: j,
+                    y: -i,
                     image: imageUrl,
-                    type: tiles[tileType].type
+                    type: tiles[tileType].type,
+                    properties: tiles[tileType].properties || {}
                 };
 
                 if(map.grid[i][j].type === 'invisible') {
@@ -153,8 +175,11 @@ module.exports = function(game) {
                 _self.game.renderer.LoadImage(imageUrl);
 
                 map.back[i][j] = {
+                    x: j,
+                    y: -i,
                     image: imageUrl,
-                    type: tiles[tileType].type
+                    type: tiles[tileType].type,
+                    properties: tiles[tileType].properties || {}
                 };
             }
         }
@@ -185,6 +210,10 @@ module.exports = function(game) {
             body.physics.x = zone.centerX - body.physics.width/2;
             body.physics.y = zone.centerY + body.physics.height/2;
         }
+    };
+
+    _self.RemoveZoneByName = function (zoneName) {
+        _self.map.zones = _self.map.zones.filter(function(zone){return zone.name !== zoneName;});
     };
 
     _self.GetGridBlocksByType = function (type) {

@@ -8,6 +8,7 @@ module.exports = function (renderer) {
         _self.playMode = options.playMode || 'default';
         _self.playSpeed = options.playSpeed || 1000;
         _self.pauseBetweenLoops = options.pauseBetweenLoops || 0;
+        _self.noLoop = options.noLoop || 0;
 
         _self.currentSlide = 0;
         _self.pingPongMode = 0;
@@ -18,6 +19,8 @@ module.exports = function (renderer) {
         };
 
         _self.changeSlide = function(cb) {
+            var prevSlide = _self.currentSlide;
+
             if(_self.playMode === 'ping-pong'){
 
                 if(_self.pingPongMode === 0) {
@@ -31,8 +34,15 @@ module.exports = function (renderer) {
                     if(_self.currentSlide < 0) {
                         _self.currentSlide = 0;
                         _self.pingPongMode = 0;
+                        if(_self.noLoop) {
+                            _self.currentSlide = prevSlide;
+                            return _self.Pause();
+                        }
                         if(_self.pauseBetweenLoops){
-                            return setTimeout(cb, _self.pauseBetweenLoops)
+                            _self.intervalTimer = setTimeout(function () {
+                                _self.Play();
+                            }, _self.pauseBetweenLoops);
+                            return;
                         }
                     }
                 }
@@ -41,28 +51,41 @@ module.exports = function (renderer) {
                 _self.currentSlide++;
                 if(_self.currentSlide >= _self.imagesCount) {
                     _self.currentSlide = 0;
+                    if(_self.noLoop) {
+                        _self.currentSlide = prevSlide;
+                        return _self.Pause();
+                    }
                     if(_self.pauseBetweenLoops){
-                        return setTimeout(cb, _self.pauseBetweenLoops)
+                        _self.intervalTimer = setTimeout(function () {
+                            _self.Play();
+                        }, _self.pauseBetweenLoops);
+                        return;
                     }
                 }
             }
 
-            cb();
+            return 'next';
         };
 
         _self.Play = function () {
-            (function loop() {
-                var waitTime = 1000;
-                if(typeof _self.playSpeed === 'number') {
-                    waitTime = _self.playSpeed;
-                } else if(typeof _self.playSpeed === 'function') {
-                    waitTime = _self.playSpeed();
-                }
+            if(_self.intervalTimer) {
+                clearInterval(_self.intervalTimer);
+            }
 
-                _self.intervalTimer = setTimeout(function () {
-                    _self.changeSlide(loop);
-                }, waitTime)
-            })();
+            var waitTime = 1000;
+            if(typeof _self.playSpeed === 'number') {
+                waitTime = _self.playSpeed;
+            } else if(typeof _self.playSpeed === 'function') {
+                waitTime = _self.playSpeed();
+            }
+
+            _self.intervalTimer = setTimeout(function () {
+                if(_self.changeSlide() === 'next') {
+                    _self.Play();
+                }
+            }, waitTime);
+
+            return _self;
         };
 
         _self.Pause = function () {
@@ -70,12 +93,14 @@ module.exports = function (renderer) {
                 clearInterval(_self.intervalTimer);
             }
             _self.intervalTimer = null;
+            return _self;
         };
 
         _self.Stop = function () {
             _self.Pause();
             _self.currentSlide = 0;
             _self.pingPongMode = 0;
+            return _self;
         };
 
         (function(){

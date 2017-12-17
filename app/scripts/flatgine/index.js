@@ -1,6 +1,7 @@
 var Physics = require('./physics');
 var Renderer = require('./renderer');
 var World = require('./world');
+var Sounds = require('./sounds');
 var ControlKeys = require('./control/keys.js');
 
 module.exports = function(canvas) {
@@ -11,6 +12,7 @@ module.exports = function(canvas) {
     _self.world = new World(_self);
     _self.physics = new Physics(_self.world);
     _self.renderer = new Renderer(_self.ctx, _self.world);
+    _self.sounds = new Sounds();
     _self.controlKeys = new ControlKeys();
 
     _self.Run = function (updateInterval) {

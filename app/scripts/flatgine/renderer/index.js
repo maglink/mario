@@ -46,8 +46,10 @@ module.exports = function(ctx, world) {
         _self.ctx.clearRect(0, 0, _self.ctx.canvas.width, _self.ctx.canvas.height);
         _self.ctx.imageSmoothingEnabled = false;
         _self.drawBackground();
-        _self.drawGrid();
-        _self.drawBodies();
+        _self.drawGrid('back');
+        _self.drawBodies(false);
+        _self.drawGrid('main');
+        _self.drawBodies(true);
     };
 
     _self.drawBackground = function () {
@@ -61,12 +63,15 @@ module.exports = function(ctx, world) {
         }
     };
 
-    _self.drawBodies = function () {
+    _self.drawBodies = function (inFront) {
         var map = _self.world.map;
         var bodies = _self.world.bodies;
 
         Object.keys(bodies).forEach(function (id) {
             var body = bodies[id];
+            if(inFront !== body.renderer.front) {
+                return;
+            }
 
             if(body.renderer.image) {
                 var texture = _self.getTexture(body.renderer.image);
@@ -81,6 +86,9 @@ module.exports = function(ctx, world) {
                 if(body.renderer.flip) {
                     _self.ctx.scale(-1, 1);
                 }
+                if(body.renderer.flipY) {
+                    _self.ctx.scale(1, -1);
+                }
                 //-----------
                 _self.ctx.drawImage(
                     texture,
@@ -90,6 +98,9 @@ module.exports = function(ctx, world) {
                     texture.height * body.renderer.yScale * _self.camera.zoomRate
                 );
                 //-----------
+                if(body.renderer.flipY) {
+                    _self.ctx.scale(1, -1);
+                }
                 if(body.renderer.flip) {
                     _self.ctx.scale(-1, 1);
                 }
@@ -97,7 +108,7 @@ module.exports = function(ctx, world) {
                     _self.ctx.rotate(-body.renderer.angle);
                 }
                 _self.ctx.translate(-x, -y);
-            } else {
+            } else if(_self.isDebug) {
                 _self.drawBodyRectangle(body)
             }
 
@@ -124,6 +135,8 @@ module.exports = function(ctx, world) {
     };
 
     _self.drawBodyRectangle = function (body) {
+        var map = _self.world.map;
+
         var x = _self.ctx.canvas.width/2 + (body.physics.x - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
         var y = _self.ctx.canvas.height/2 - (body.physics.y - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
         var width = body.physics.width * map.tilewidth * _self.camera.zoomRate;
@@ -136,7 +149,7 @@ module.exports = function(ctx, world) {
         _self.ctx.closePath();
     };
 
-    _self.drawGrid = function () {
+    _self.drawGrid = function (gridName) {
         var map = _self.world.map;
 
         var startJ = Math.floor(_self.camera.x - _self.ctx.canvas.width/2/_self.camera.zoomRate/map.tilewidth);
@@ -160,8 +173,8 @@ module.exports = function(ctx, world) {
                 endJ = map.grid[i].length
             }
             for(var j=startJ;j<endJ;j++){
-                _self.drawGridCell(map.back, i, j);
-                _self.drawGridCell(map.grid, i, j);
+                if(gridName === 'back') _self.drawGridCell(map.back, i, j);
+                if(gridName === 'main') _self.drawGridCell(map.grid, i, j);
             }
         }
     };
@@ -175,8 +188,8 @@ module.exports = function(ctx, world) {
 
         var cell = grid[i][j];
         var texture = _self.getTexture(cell.image);
-        var x = j*map.tilewidth;
-        var y = -1*i*map.tileheight;
+        var x = j*map.tilewidth + (cell.imageOffsetX||0);
+        var y = -1*i*map.tileheight + (cell.imageOffsetY||0);
 
         _self.ctx.drawImage(
             texture,
