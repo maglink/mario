@@ -129,8 +129,8 @@ module.exports = function(game, onCharDie) {
             }
         });
         _self.setSmallMario();
-        //_self.setSuperMario();
-        //_self.setLuigiMario();
+        _self.setSuperMario();
+        _self.setLuigiMario();
     };
 
     _self.timeleft = 400;
