@@ -694,13 +694,13 @@ module.exports = function(game, onCharDie) {
                 imageUrl: function(i) {
                     return 'files/bullet/bullet-blow'+(i+1)+".png"
                 },
-                playSpeed: 1000/20,
+                playSpeed: 1000/10,
                 noLoop: true
             });
             bullet.renderer.image = imageBulletBlow.Play();
             setTimeout(function () {
                 _self.game.world.RemoveBody(bullet)
-            }, (1000/24)*3);
+            }, (1000/10)*3);
         };
 
         setTimeout(function(){
