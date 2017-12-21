@@ -129,8 +129,8 @@ module.exports = function(game, onCharDie) {
             }
         });
         _self.setSmallMario();
-        _self.setSuperMario();
-        _self.setLuigiMario();
+        //_self.setSuperMario();
+        //_self.setLuigiMario();
     };
 
     _self.timeleft = 400;
@@ -494,15 +494,17 @@ module.exports = function(game, onCharDie) {
 
         if(_self.timeleft === 200) {
             game.sounds.StopBackground();
-            //game.sounds.Play('hurry-start');
-            game.sounds.PlayBackground('hurry');
+            game.sounds.Play('hurry-start');
+            setTimeout(function () {
+                game.sounds.PlayBackground('hurry');
+            }, 4000);
         }
 
         if(_self.timeleft <= 0) {
             _self.die();
         }
 
-    }, 1000);
+    }, 500);
 
     _self.isHurryMode = function() {
         return _self.timeleft < 200;
@@ -567,7 +569,7 @@ module.exports = function(game, onCharDie) {
             } else {
                 game.sounds.PlayBackground('main_theme');
             }
-        }, 12000);
+        }, 13000);
     };
 
     _self.setDamage = function () {
