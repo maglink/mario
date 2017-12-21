@@ -29,17 +29,6 @@
          "name":"zones",
          "objects":[
                 {
-                 "height":16,
-                 "id":2,
-                 "name":"player",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":64,
-                 "y":240
-                }, 
-                {
                  "height":240,
                  "id":7,
                  "name":"enemy_1_trigger",
@@ -500,6 +489,17 @@
                  "width":16,
                  "x":3160,
                  "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":63,
+                 "name":"player",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2512,
+                 "y":208
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -507,7 +507,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":63,
+ "nextobjectid":64,
  "orientation":"orthogonal",
  "renderorder":"left-up",
  "tiledversion":"1.0.3",

@@ -15,6 +15,11 @@ module.exports.AddFinishFlag = function(game, char) {
 
     game.world.AddBodyEventListener(char.body, 'onZoneIn', function (zone) {
         if(zone.name === "finish" && !oneTouch) {
+            game.sounds.StopBackground();
+            game.sounds.Play('flag');
+            setTimeout(function () {
+                game.sounds.Play('level_complete');
+            }, 1500);
             oneTouch = true;
             var points = 5000;
             var level = char.body.physics.y-char.body.physics.height - finishFlag.physics.y;
@@ -24,14 +29,14 @@ module.exports.AddFinishFlag = function(game, char) {
             }
             points = Math.round(points);
 
+            game.addGamePoints(points);
 
             finishFlag.physics.isStatic = false;
             char.finish()
         }
         if(zone.name === "exit") {
             setTimeout(function(){
-                game.world.RemoveBody(char.body)
-                alert("finish")
+                game.world.RemoveBody(char.body);
             }, 1000/2.1)
         }
     });

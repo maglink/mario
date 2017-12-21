@@ -13,27 +13,35 @@ var canvasElement = $('#canvas').get(0);
 var game = new Flatgine(canvasElement);
 game.physics.gravity = 9.8*4;
 game.Run(1000/30);
-LoadGame();
 var zoom;
 
-Counters.points(game);
-Counters.lifes(game);
+var global = {char:{}};
+
 Counters.timeleft(game);
+Counters.points(game,global.char);
+Counters.lifes(game,global.char);
+
+LoadGame();
 
 function LoadGame() {
     $.getJSON( "files/maps/map1.json", function(data) {
 
         game.world.LoadMap(data, 'files/maps/');
 
-        //char
         var char = new Char(game, function(){
             game.RemoveLife();
             if(game.charlifes > 1) {
                 LoadGame();
             } else {
+                game.sounds.StopBackground();
+                game.sounds.Play("gameover");
                 //todo: end of game
             }
         });
+
+        global.char = char;
+
+        //char
         char.CreateBody();
         game.world.SetBodyPositionByZone(char.body, "player");
 

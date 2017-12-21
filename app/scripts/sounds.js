@@ -19,6 +19,10 @@ module.exports = function(game) {
     game.sounds.AddSound('squish', 'files/sounds/Squish.wav');
     game.sounds.AddSound('1up', 'files/sounds/1up.wav');
     game.sounds.AddSound('bullet', 'files/sounds/Fire Ball.wav');
+    game.sounds.AddSound('warp', 'files/sounds/Warp.wav');
+    game.sounds.AddSound('flag', 'files/sounds/Flagpole.wav');
+    game.sounds.AddSound('gameover', 'files/sounds/Game Over.wav');
+    game.sounds.AddSound('level_complete', 'files/sounds/smb_level_complete.wav');
 
     game.sounds.AddSound('game-over', 'files/music/09-game-over.mp3');
     game.sounds.AddSound('hurry-start', 'files/music/13-hurry-start.mp3');

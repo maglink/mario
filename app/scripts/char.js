@@ -494,11 +494,11 @@ module.exports = function(game, onCharDie) {
 
         if(_self.timeleft === 200) {
             game.sounds.StopBackground();
-            game.sounds.Play('hurry-start');
+            //game.sounds.Play('hurry-start');
             game.sounds.PlayBackground('hurry');
         }
 
-        if(_self.timeleft === 0) {
+        if(_self.timeleft <= 0) {
             _self.die();
         }
 
@@ -575,9 +575,11 @@ module.exports = function(game, onCharDie) {
             return;
         }
         if(_self.marioMode === 'luigi') {
+            _self.game.sounds.Play('warp');
             _self.setSuperMario();
             _self.setProtection();
         } else if(_self.marioMode === 'super') {
+            _self.game.sounds.Play('warp');
             _self.setSmallMario();
             _self.setProtection();
         } else {
@@ -803,6 +805,7 @@ module.exports = function(game, onCharDie) {
 
     _self.runEnterToBackground = function () {
         game.sounds.StopBackground();
+        _self.game.sounds.Play('warp');
         _self.inOverworld = true;
         _self.inBackground = false;
         _self.isTeleporting = true;
@@ -843,6 +846,7 @@ module.exports = function(game, onCharDie) {
 
     _self.runExitFromBackground = function () {
         game.sounds.StopBackground();
+        _self.game.sounds.Play('warp');
         _self.inOverworld = false;
         _self.inBackground = true;
         _self.isTeleporting = true;
@@ -906,6 +910,8 @@ module.exports = function(game, onCharDie) {
     };
 
     _self.finish = function() {
+        clearInterval(_self.timeleftInterval);
+
         _self.isFinish = true;
         var runInterval = setInterval(function(){
             _self.body.physics.vx = 2

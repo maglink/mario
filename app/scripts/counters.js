@@ -1,6 +1,6 @@
 var $ = require('jquery');
 
-module.exports.points = function(game) {
+module.exports.points = function(game, char) {
     game.points = 0;
     $("#points").text(game.points);
     game.addGamePoints = function(count) {
@@ -10,7 +10,7 @@ module.exports.points = function(game) {
 };
 
 
-module.exports.lifes = function(game) {
+module.exports.lifes = function(game, char) {
     game.charlifes = 3;
     $("#lifes").text(game.charlifes);
     game.AddLife = function() {

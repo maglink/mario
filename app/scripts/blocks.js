@@ -261,7 +261,7 @@ module.exports.Coin = function(game) {
     game.world.GetGridBlocksByType('coin').forEach(function (block) {
         block.noCollideObjects = true;
         block.onTouch = function() {
-            game.addGamePoints(100);
+            game.AddLife();
             game.sounds.Play('coin');
             game.world.RemoveCell(block);
         }
