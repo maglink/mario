@@ -525,7 +525,7 @@
          "margin":0,
          "name":"mario",
          "spacing":0,
-         "tilecount":57,
+         "tilecount":58,
          "tileheight":16,
          "tileproperties":
             {
@@ -884,6 +884,12 @@
              "57":
                 {
                  "image":"textures\/33a.png",
+                 "imageheight":16,
+                 "imagewidth":16
+                },
+             "58":
+                {
+                 "image":"textures\/card.png",
                  "imageheight":16,
                  "imagewidth":16
                 },

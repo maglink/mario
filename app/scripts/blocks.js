@@ -1,16 +1,15 @@
 module.exports.QuestionBlock = function (game) {
     var questionBlockImage = new game.renderer.animation({
-        imagesCount: 3,
+        imagesCount: 12,
         imageUrl: function(i) {
             return "files/question_block/" +(i+1)+ ".png"
         },
-        playMode: 'ping-pong',
         playSpeed: 1000/10,
         pauseBetweenLoops: 300
     });
     questionBlockImage.Play();
 
-    var activatedImage = game.renderer.LoadImage("files/question_block/4.png");
+    var activatedImage = game.renderer.LoadImage("files/question_block/qbb.png");
     var mushroomImage = game.renderer.LoadImage("files/question_block/mushroom.png");
     var levelUpImage = game.renderer.LoadImage("files/question_block/level-up.png");
 
@@ -28,7 +27,9 @@ module.exports.QuestionBlock = function (game) {
             block.noCollideObjects = true;
         } else {
             block.image = questionBlockImage;
+
         }
+        block.imageOffsetY = 0.5;
         block.onTouch = function(params) {
             params = params || {};
 
@@ -94,7 +95,7 @@ module.exports.QuestionBlock = function (game) {
                 var flower = game.world.AddBody({
                     type: 'flower',
                     width: 0.9,
-                    x: block.x+0.05,
+                    x: block.x + 0.05,
                     y: block.y + 1,
                     image: flowerImage.Play()
                 });
@@ -203,7 +204,6 @@ function addCoin(game, block) {
 }
 
 module.exports.BreakableWall = function (game) {
-
 
     var postBreakImage = game.renderer.LoadImage("files/breakable_wall/post_break.png");
     var particleImage = new game.renderer.animation({
