@@ -29,7 +29,6 @@ module.exports.QuestionBlock = function (game) {
             block.image = questionBlockImage;
 
         }
-        block.imageOffsetY = 0.5;
         block.onTouch = function(params) {
             params = params || {};
 
