@@ -104,17 +104,14 @@ function LoadSoundsSettings() {
         game.sounds.SetMasterVolume(soundsVolume);
         $("#sounds_button_cancelled").hide();
         $("#sounds_button").show();
-        $("#music_button").show();
     } else if(soundsVolume === 0) {
         game.sounds.SetMasterVolume(0);
         $("#sounds_button_cancelled").show();
         $("#sounds_button").hide();
-        $("#music_button").hide();
     } else {
         game.sounds.SetMasterVolume(1);
         $("#sounds_button_cancelled").hide();
         $("#sounds_button").show();
-        $("#music_button").show();
     }
 
     $("#sounds_button").click(function () {
@@ -124,7 +121,6 @@ function LoadSoundsSettings() {
         game.sounds.SetMasterVolume(0);
         $(this).hide();
         $("#sounds_button_cancelled").show();
-        $("#music_button").hide();
         Cookie.setCookie("sounds_volume", 0);
     });
 
@@ -132,7 +128,6 @@ function LoadSoundsSettings() {
         game.sounds.SetMasterVolume(game.sounds.lastMasterVolume || 1);
         $(this).hide();
         $("#sounds_button").show();
-        $("#music_button").show();
         Cookie.setCookie("sounds_volume", game.sounds.masterVolume);
     });
 }
