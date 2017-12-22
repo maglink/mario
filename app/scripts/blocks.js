@@ -29,6 +29,7 @@ module.exports.QuestionBlock = function (game) {
             block.image = questionBlockImage;
 
         }
+        block.imageOffsetY = 1;
         block.onTouch = function(params) {
             params = params || {};
 
@@ -268,7 +269,7 @@ module.exports.Coin = function(game) {
 };
 
 module.exports.Multicoin = function(game) {
-    var activatedImage = game.renderer.LoadImage("files/question_block/4.png");
+    var activatedImage = game.renderer.LoadImage("files/question_block/qbb.png");
 
     game.world.GetGridBlocksByType('multicoin').forEach(function (block) {
 
@@ -302,7 +303,7 @@ module.exports.Multicoin = function(game) {
 
 module.exports.Star = function(game) {
 
-    var activatedImage = game.renderer.LoadImage("files/question_block/4.png");
+    var activatedImage = game.renderer.LoadImage("files/question_block/qbb.png");
     var starImage = new game.renderer.animation({
         imagesCount: 4,
         imageUrl: function(i) {

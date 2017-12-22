@@ -17,6 +17,13 @@ module.exports = function(world) {
         }
     };
 
+    _self.afterHandlers = [];
+    _self.After = function(handler) {
+        if(typeof handler === 'function') {
+            _self.afterHandlers.push(handler);
+        }
+    };
+
     _self.setTimeFrequency = function(frequency) {
         _self.timeFrequency = frequency;
     };
@@ -73,7 +80,9 @@ module.exports = function(world) {
             }
 
             _self.checkZones(body);
-        })
+        });
+
+        _self.afterHandlers.forEach(function (handler) { handler(); });
     };
 
     _self.checkZones = function (body) {

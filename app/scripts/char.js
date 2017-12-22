@@ -197,6 +197,9 @@ module.exports = function(game, onCharDie) {
         keyName: "down",
         keyChars: ["ArrowDown", "S", "s", "Ы", "ы"],
         handlerPress: function () {
+            if(_self.isTeleporting) {
+                return;
+            }
             if(_self.isFinish) {
                 return;
             }
@@ -312,6 +315,21 @@ module.exports = function(game, onCharDie) {
         setTimeout(function () {
             _self.isGrounded = false;
         }, 0)
+    });
+
+    _self.game.physics.After(function () {
+        if(!_self.charMaxPosX) {
+            _self.charMaxPosX = _self.body.physics.x;
+        }
+        if(_self.body.physics.x < _self.charMaxPosX - 8) {
+            _self.body.physics.x = _self.charMaxPosX - 8;
+            if(_self.body.physics.vx < 0) {
+                _self.body.physics.vx = 0;
+            }
+        }
+        if(_self.body.physics.x > _self.charMaxPosX) {
+            _self.charMaxPosX = _self.body.physics.x;
+        }
     });
 
     //---------------------
@@ -492,7 +510,8 @@ module.exports = function(game, onCharDie) {
         _self.timeleft--;
         game.UpdateTimeleft(_self.timeleft);
 
-        if(_self.timeleft === 200) {
+        if(_self.timeleft < 200 && !_self.timeleftHasBeedHurry) {
+            _self.timeleftHasBeedHurry = true;
             game.sounds.StopBackground();
             game.sounds.Play('hurry-start');
             setTimeout(function () {

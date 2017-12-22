@@ -195,8 +195,8 @@ module.exports = function(ctx, world) {
             texture,
             _self.ctx.canvas.width/2 + (x - _self.camera.x*map.tilewidth) * _self.camera.zoomRate,
             _self.ctx.canvas.height/2 - (y - _self.camera.y*map.tileheight) * _self.camera.zoomRate,
-            map.tilewidth * _self.camera.zoomRate,
-            map.tileheight * _self.camera.zoomRate
+            texture.width * _self.camera.zoomRate,
+            texture.height * _self.camera.zoomRate
         );
 
         if(_self.isDebug) {

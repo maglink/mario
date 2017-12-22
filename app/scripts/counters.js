@@ -1,6 +1,6 @@
 var $ = require('jquery');
 
-module.exports.points = function(game, char) {
+module.exports.points = function(game) {
     game.points = 0;
     $("#points").text(game.points);
     game.addGamePoints = function(count) {
@@ -10,7 +10,7 @@ module.exports.points = function(game, char) {
 };
 
 
-module.exports.lifes = function(game, char) {
+module.exports.lifes = function(game) {
     game.charlifes = 3;
     $("#lifes").text(game.charlifes);
     game.AddLife = function() {
@@ -24,7 +24,7 @@ module.exports.lifes = function(game, char) {
 };
 
 module.exports.timeleft = function(game) {
-    game.timeleft=400;
+    game.timeleft=215;
     $("#timeleft").text(game.timeleft);
     game.UpdateTimeleft = function(timeleft) {
         game.timeleft = timeleft;

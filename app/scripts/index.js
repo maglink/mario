@@ -6,128 +6,108 @@ var Sounds = require('./sounds.js');
 var Enemies = require('./enemies.js');
 var Finish = require('./finish.js');
 var Counters = require('./counters.js');
-var Cookie = require('./cookie.js');
 
 var canvasElement = $('#canvas').get(0);
 
+var global = {char:null};
+
 var game = new Flatgine(canvasElement);
 game.physics.gravity = 9.8*4;
-game.Run(1000/30);
-var zoom;
+var mapData;
 
-var global = {char:{}};
-
-Counters.timeleft(game);
-Counters.points(game,global.char);
-Counters.lifes(game,global.char);
-
-LoadGame();
-
-function LoadGame() {
+function LoadSources(cb) {
     $.getJSON( "files/maps/map1.json", function(data) {
-
-        game.world.LoadMap(data, 'files/maps/');
-
-        var char = new Char(game, function(){
-            game.RemoveLife();
-            if(game.charlifes > 1) {
-                LoadGame();
-            } else {
-                game.sounds.StopBackground();
-                game.sounds.Play("gameover");
-                //todo: end of game
-            }
-        });
-
-        global.char = char;
-
-        //char
-        char.CreateBody();
-        game.world.SetBodyPositionByZone(char.body, "player");
-
-        //camera
-        zoom = (game.renderer.ctx.canvas.height/game.world.map.tileheight)/14;
-        game.renderer.camera.SetZoom(zoom);
-        game.renderer.camera.SetPositionByBody(char.body);
-        game.renderer.camera.Follow(char.body, false, {y:5});
-        game.renderer.BeforeRender(function () {
-
-            if(char.inBackground) {
-                game.renderer.camera.x = 65;
-                game.renderer.camera.y = -27.5;
-            } else {
-                game.renderer.camera.y = -10.5;
-
-                var leftEdge = (game.renderer.ctx.canvas.width/game.world.map.tilewidth/zoom)/2 + 1;
-                if(game.renderer.camera.x < leftEdge) {
-                    game.renderer.camera.x = leftEdge;
-                }
-
-                var rightEdge = game.world.map.grid[0].length - (game.renderer.ctx.canvas.width/game.world.map.tilewidth/zoom)/2 - 1;
-                if(game.renderer.camera.x > rightEdge) {
-                    game.renderer.camera.x = rightEdge;
-                }
-            }
-        });
-
-        //-----
-
-        Sounds(game);
-        LoadSoundsSettings();
-        Blocks.QuestionBlock(game);
-        Blocks.BreakableWall(game);
-        Blocks.Coin(game);
-        Blocks.Multicoin(game);
-        Blocks.Star(game);
-        Enemies.AddEnimies(game, char);
-        Finish.AddFinishFlag(game, char);
-
-    });
+        mapData = data;
+        cb();
+    })
 }
 
+LoadSources(function () {
+    game.Run(1000/30);
 
-function onResize() {
-    canvasElement.width  = window.innerWidth;
-    canvasElement.height = window.innerHeight;
+    Sounds.LoadSounds(game);
+    Sounds.LoadSoundsSettings(game);
 
-    if(game.world.map) {
-        zoom = (game.renderer.ctx.canvas.height/game.world.map.tileheight)/14;
-        game.renderer.camera.SetZoom(zoom);
-    }
-}
-$(window).resize(onResize);
-onResize();
+    Counters.timeleft(game);
+    Counters.points(game);
+    Counters.lifes(game);
 
-function LoadSoundsSettings() {
-    var soundsVolume = Number(Cookie.getCookie("sounds_volume"));
-    if(soundsVolume) {
-        game.sounds.SetMasterVolume(soundsVolume);
-        $("#sounds_button_cancelled").hide();
-        $("#sounds_button").show();
-    } else if(soundsVolume === 0) {
-        game.sounds.SetMasterVolume(0);
-        $("#sounds_button_cancelled").show();
-        $("#sounds_button").hide();
-    } else {
-        game.sounds.SetMasterVolume(1);
-        $("#sounds_button_cancelled").hide();
-        $("#sounds_button").show();
-    }
+    game.renderer.BeforeRender(function () {
 
-    $("#sounds_button").click(function () {
-        if(game.sounds.masterVolume) {
-            game.sounds.lastMasterVolume = game.sounds.masterVolume;
+        var zoom = game.renderer.camera.zoomRate;
+
+        if(global.char.inBackground) {
+            game.renderer.camera.x = 65;
+            game.renderer.camera.y = -27.5;
+        } else {
+            game.renderer.camera.y = -10.5;
+
+            var leftEdge = (game.renderer.ctx.canvas.width/game.world.map.tilewidth/zoom)/2 + 1;
+            if(game.renderer.camera.x < leftEdge) {
+                game.renderer.camera.x = leftEdge;
+            }
+
+            var rightEdge = game.world.map.grid[0].length - (game.renderer.ctx.canvas.width/game.world.map.tilewidth/zoom)/2 - 1;
+            if(game.renderer.camera.x > rightEdge) {
+                game.renderer.camera.x = rightEdge;
+            }
+
+            if(!game.renderer.camera.cameraMaxPos) {
+                game.renderer.camera.cameraMaxPos = game.renderer.camera.x;
+            }
+            if(game.renderer.camera.cameraMaxPos > game.renderer.camera.x) {
+                game.renderer.camera.x = game.renderer.camera.cameraMaxPos;
+            }
+            game.renderer.camera.cameraMaxPos = game.renderer.camera.x;
         }
-        game.sounds.SetMasterVolume(0);
-        $(this).hide();
-        $("#sounds_button_cancelled").show();
-        Cookie.setCookie("sounds_volume", 0);
+
     });
 
-    $("#sounds_button_cancelled").click(function () {
-        game.sounds.SetMasterVolume(game.sounds.lastMasterVolume || 1);
-        $(this).hide();
-        $("#sounds_button").show();
-        Cookie.setCookie("sounds_volume", game.sounds.masterVolume);
+    function onResize() {
+        canvasElement.width  = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+
+        if(game.world.map) {
+            var zoom = (game.renderer.ctx.canvas.height/game.world.map.tileheight)/14;
+            game.renderer.camera.SetZoom(zoom);
+        }
+    }
+    $(window).resize(onResize);
+    onResize();
+
+    LoadLevel();
+});
+
+function LoadLevel() {
+    game.world.LoadMap(mapData, 'files/maps/');
+    Blocks.QuestionBlock(game);
+    Blocks.BreakableWall(game);
+    Blocks.Coin(game);
+    Blocks.Multicoin(game);
+    Blocks.Star(game);
+
+    var char = new Char(game, function(){
+        game.RemoveLife();
+        if(game.charlifes > 0 && game.timeleft > 0) {
+            LoadLevel();
+        } else {
+            game.sounds.StopBackground();
+            game.sounds.Play("gameover");
+            //todo: end of game
+        }
     });
+    global.char = char;
+    char.CreateBody();
+    game.world.SetBodyPositionByZone(char.body, "player");
+
+    game.renderer.camera.cameraMaxPos = null;
+    game.renderer.camera.SetPositionByBody(char.body);
+    game.renderer.camera.Follow(char.body, false, {y:5});
+    var zoom = (game.renderer.ctx.canvas.height/game.world.map.tileheight)/14;
+    game.renderer.camera.SetZoom(zoom);
+
+    Enemies.AddEnimies(game, char);
+    Finish.AddFinishFlag(game, char);
+
+    game.sounds.PlayBackground('main_theme');
 }
