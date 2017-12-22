@@ -1,9 +1,10 @@
 module.exports.QuestionBlock = function (game) {
     var questionBlockImage = new game.renderer.animation({
-        imagesCount: 1,
+        imagesCount: 4,
         imageUrl: function(i) {
             return "files/question_block/" +(i+1)+ ".png"
         },
+        playMode: 'ping-pong',
         playSpeed: 1000/10,
         pauseBetweenLoops: 300
     });
