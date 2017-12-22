@@ -165,6 +165,7 @@ module.exports = function(game, onCharDie) {
         keyName: "A/up",
         keyChars: ["ArrowUp", "W", "w", " ", "K", "k", "Ц", "ц", "Л", "л"],
         handlerPress: function () {
+            _self.checkFirstTap();
             if(_self.isFinish) {
                 return;
             }
@@ -181,6 +182,7 @@ module.exports = function(game, onCharDie) {
         keyName: "B",
         keyChars: ["Shift", "J", "j", "О", "о"],
         handlerPress: function () {
+            _self.checkFirstTap();
             if(_self.isFinish) {
                 return;
             }
@@ -197,6 +199,7 @@ module.exports = function(game, onCharDie) {
         keyName: "down",
         keyChars: ["ArrowDown", "S", "s", "Ы", "ы"],
         handlerPress: function () {
+            _self.checkFirstTap();
             if(_self.isTeleporting) {
                 return;
             }
@@ -234,6 +237,7 @@ module.exports = function(game, onCharDie) {
         keyName: "left",
         keyChars: ["ArrowLeft", "A", "a", "Ф", "ф"],
         handlerPress: function () {
+            _self.checkFirstTap();
             if(_self.isFinish) {
                 return;
             }
@@ -251,6 +255,7 @@ module.exports = function(game, onCharDie) {
         keyName: "right",
         keyChars: ["ArrowRight", "D", "d", "В", "в"],
         handlerPress: function () {
+            _self.checkFirstTap();
             if(_self.isFinish) {
                 return;
             }
@@ -507,6 +512,9 @@ module.exports = function(game, onCharDie) {
     game.UpdateTimeleft(_self.timeleft);
 
     _self.timeleftInterval = setInterval(function(){
+        if(!game.firstKeyboardTapped) {
+            return;
+        }
         _self.timeleft--;
         game.UpdateTimeleft(_self.timeleft);
 
@@ -941,6 +949,15 @@ module.exports = function(game, onCharDie) {
         setTimeout(function () {
             clearInterval(runInterval)
         }, 10000)
+    };
+
+    game.firstKeyboardTapped = false;
+    _self.checkFirstTap = function() {
+        if(_self.firstKeyboardTapped) {
+            return;
+        }
+        game.firstKeyboardTapped = true;
+        game.firstTapEvent();
     };
 
     return _self;

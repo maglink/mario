@@ -63,6 +63,10 @@ LoadSources(function () {
 
     });
 
+    game.firstTapEvent = function(){
+        $("#keyboard").fadeOut(500)
+    };
+
     function onResize() {
         canvasElement.width  = window.innerWidth;
         canvasElement.height = window.innerHeight;

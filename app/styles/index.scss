@@ -17,6 +17,19 @@ body {
   color: white;
   font-size: 4vmin;
   font-family: fantasy;
+
+  #keyboard {
+    padding-top: 2%;
+    padding-left: 18%;
+    text-align: left;
+
+    > img {
+      width: 80%;
+      max-width: 680px;
+
+      box-shadow: 10px 10px 48px 0px rgba(0,0,0,0.75);
+    }
+  }
 }
 
 #ui > #header {
@@ -42,4 +55,3 @@ body {
     color: #fff;
   }
 }
-
