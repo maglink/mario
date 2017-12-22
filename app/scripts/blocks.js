@@ -1,6 +1,6 @@
 module.exports.QuestionBlock = function (game) {
     var questionBlockImage = new game.renderer.animation({
-        imagesCount: 12,
+        imagesCount: 1,
         imageUrl: function(i) {
             return "files/question_block/" +(i+1)+ ".png"
         },
