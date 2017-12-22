@@ -24,7 +24,7 @@ module.exports.lifes = function(game) {
 };
 
 module.exports.timeleft = function(game) {
-    game.timeleft=215;
+    game.timeleft=400;
     $("#timeleft").text(game.timeleft);
     game.UpdateTimeleft = function(timeleft) {
         game.timeleft = timeleft;
