@@ -114,6 +114,9 @@ module.exports = function(game, onCharDie) {
             if(zone.name === "port2") {
                 _self.readyToPort2 = true;
             }
+            if(zone.name === "checkpoint1_trigger") {
+                game.isCheckpoint = true;
+            }
         });
         game.world.AddBodyEventListener(_self.body, 'onZoneOut', function (zone) {
             if(_self.isDead) {
@@ -647,7 +650,7 @@ module.exports = function(game, onCharDie) {
         var count = 0;
         var interval = setInterval(function () {
             count+=1000/30;
-            if(count >= 5000) {
+            if(count >= 3000) {
                 clearInterval(interval);
                 _self.game.physics.timeRate = 1;
                 onCharDie();
@@ -668,14 +671,6 @@ module.exports = function(game, onCharDie) {
             return 'files/bullet/bullet'+(i+1)+".png"
         },
         playSpeed: 1000/24
-    });
-    _self.imageBulletBlow = new _self.game.renderer.animation({
-        imagesCount: 3,
-        imageUrl: function(i) {
-            return 'files/bullet/bullet-blow'+(i+1)+".png"
-        },
-        playSpeed: 1000/24,
-        noLoop: true
     });
     _self.lastBullet1 = 0;
     _self.lastBullet2 = 0;

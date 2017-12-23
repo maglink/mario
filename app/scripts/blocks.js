@@ -32,6 +32,12 @@ module.exports.QuestionBlock = function (game) {
         }
         block.imageOffsetY = 1;
         block.onTouch = function(params) {
+
+            block.dangerous = true;
+            setTimeout(function () {
+                block.dangerous = false;
+            }, 50);
+
             params = params || {};
 
             block.image = activatedImage;
@@ -252,6 +258,11 @@ module.exports.BreakableWall = function (game) {
                 game.sounds.Play('bump');
                 blockjump(block)
             }
+
+            block.dangerous = true;
+            setTimeout(function () {
+                block.dangerous = false;
+            }, 50)
         }
     })
 };
@@ -262,7 +273,7 @@ module.exports.Coin = function(game) {
     game.world.GetGridBlocksByType('coin').forEach(function (block) {
         block.noCollideObjects = true;
         block.onTouch = function() {
-            game.AddLife();
+            game.AddCoin();
             game.sounds.Play('coin');
             game.world.RemoveCell(block);
         }

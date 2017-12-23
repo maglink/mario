@@ -10,7 +10,7 @@ module.exports.points = function(game) {
         $("#points").text(pad(game.points, 6));
 
 
-        if(game.char) {
+        if(game.char && !game.char.isFinish) {
 
             var pointLabel = game.world.AddBody({
                 isStatic: true,
@@ -34,17 +34,25 @@ module.exports.points = function(game) {
 
 };
 
-
 module.exports.lifes = function(game) {
     game.charlifes = 3;
-    $("#lifes").text(pad(game.charlifes, 2));
+    $("#lifes").text(game.charlifes);
     game.AddLife = function() {
         game.charlifes++;
-        $("#lifes").text(pad(game.charlifes, 2));
+        $("#lifes").text(game.charlifes);
     };
     game.RemoveLife = function() {
         game.charlifes--;
-        $("#lifes").text(pad(game.charlifes, 2));
+        $("#lifes").text(game.charlifes);
+    };
+};
+
+module.exports.coins = function(game) {
+    game.charcoins = 0;
+    $("#coins").text(pad(game.charcoins, 2));
+    game.AddCoin = function() {
+        game.charcoins++;
+        $("#coins").text(pad(game.charcoins, 2));
     };
 };
 

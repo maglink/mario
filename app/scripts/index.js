@@ -43,6 +43,7 @@ LoadSources(function () {
     Counters.timeleft(game);
     Counters.points(game);
     Counters.lifes(game);
+    Counters.coins(game);
 
     game.renderer.BeforeRender(function () {
 
@@ -105,16 +106,26 @@ function LoadLevel() {
     var char = new Char(game, function(){
         game.RemoveLife();
         if(game.charlifes > 0 && game.timeleft > 0) {
-            LoadLevel();
-        } else {
-            game.sounds.StopBackground();
-            game.sounds.Play("gameover");
-            //todo: end of game
+            $("#die_screen").fadeIn();
         }
+        setTimeout(function () {
+            if(game.charlifes > 0 && game.timeleft > 0) {
+                $("#die_screen").fadeOut();
+                LoadLevel();
+            } else {
+                game.sounds.StopBackground();
+                game.sounds.Play("gameover");
+                $("#gameover").fadeIn();
+            }
+        }, 2000);
     });
     game.char = char;
     char.CreateBody();
-    game.world.SetBodyPositionByZone(char.body, "player");
+    if(game.isCheckpoint) {
+        game.world.SetBodyPositionByZone(char.body, "checkpoint1");
+    } else {
+        game.world.SetBodyPositionByZone(char.body, "player");
+    }
 
     game.renderer.camera.cameraMaxPos = null;
     game.renderer.camera.SetPositionByBody(char.body);

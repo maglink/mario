@@ -492,7 +492,40 @@
                 }, 
                 {
                  "height":16,
-                 "id":65,
+                 "id":71,
+                 "name":"checkpoint1",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1328,
+                 "y":240
+                }, 
+                {
+                 "height":240,
+                 "id":72,
+                 "name":"checkpoint1_trigger",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1328,
+                 "y":16
+                }, 
+                {
+                 "height":176,
+                 "id":73,
+                 "name":"checkpoint1_trigger",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1088,
+                 "y":352
+                }, 
+                {
+                 "height":16,
+                 "id":74,
                  "name":"player",
                  "rotation":0,
                  "type":"",
@@ -507,7 +540,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":66,
+ "nextobjectid":75,
  "orientation":"orthogonal",
  "renderorder":"left-up",
  "tiledversion":"1.0.3",

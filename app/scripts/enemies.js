@@ -64,6 +64,9 @@ module.exports.AddEnimies = function (game, char) {
             }
         });
         game.world.AddBodyEventListener(enemy, 'onGridTouch', function (event) {
+            if(event.cells[0].dangerous){
+                epicDie(enemy.physics.vx);
+            }
             if(event.side === 'left' || event.side === 'right') {
                 side *= -1;
             }

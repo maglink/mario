@@ -159,6 +159,7 @@ var filesList = [
     'files/enemies/enemy_2-4.png',
     'files/img/coin.gif',
     'files/img/keyboard.png',
+    'files/img/mario.png',
     'files/question_block/1.png',
     'files/question_block/2.png',
     'files/question_block/3.png',
@@ -208,7 +209,7 @@ module.exports.loadFiles = function(cb) {
 
     var filesProcessed = 0;
 
-    async.eachLimit(filesList, 5, function(fileUrl, cb) {
+    async.eachLimit(filesList, 10, function(fileUrl, cb) {
         $.get(fileUrl, function() {
             filesProcessed++;
             _self.setProgress(Math.floor((filesProcessed/filesList.length)*100*((100-10)/100))+10);

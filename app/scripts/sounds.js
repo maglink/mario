@@ -31,6 +31,7 @@ module.exports.LoadSounds = function(game) {
     game.sounds.AddSound('flag', 'files/sounds/Flagpole.wav');
     game.sounds.AddSound('gameover', 'files/sounds/Game Over.wav');
     game.sounds.AddSound('level_complete', 'files/sounds/smb_level_complete.wav');
+    game.sounds.AddSound('beep', 'files/sounds/Beep.wav');
 
     game.sounds.AddSound('game-over', 'files/music/09-game-over.mp3');
     game.sounds.AddSound('hurry-start', 'files/music/13-hurry-start.mp3');
