@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var async = require('async');
 var Flatgine = require('./flatgine');
 var Char = require('./char.js');
 var Blocks = require('./blocks.js');
@@ -6,23 +7,34 @@ var Sounds = require('./sounds.js');
 var Enemies = require('./enemies.js');
 var Finish = require('./finish.js');
 var Counters = require('./counters.js');
+var Sources = require('./sources.js');
 
 var canvasElement = $('#canvas').get(0);
-
-var global = {char:null};
 
 var game = new Flatgine(canvasElement);
 game.physics.gravity = 9.8*4;
 var mapData;
 
 function LoadSources(cb) {
-    $.getJSON( "files/maps/map1.json", function(data) {
-        mapData = data;
-        cb();
-    })
+    Sources.setProgress(0);
+
+    async.series([
+        function(cb) {
+            $.getJSON( "files/maps/map1.json", function(data) {
+                mapData = data;
+                Sources.setProgress(10);
+                cb();
+            })
+        },
+        function (cb) {
+            Sources.loadFiles(cb)
+        }
+    ], cb);
 }
 
 LoadSources(function () {
+    Sources.setProgress(100);
+    $("#loader").hide();
     game.Run(1000/30);
 
     Sounds.LoadSounds(game);
@@ -36,7 +48,7 @@ LoadSources(function () {
 
         var zoom = game.renderer.camera.zoomRate;
 
-        if(global.char.inBackground) {
+        if(game.char.inBackground) {
             game.renderer.camera.x = 65;
             game.renderer.camera.y = -27.5;
         } else {
@@ -100,7 +112,7 @@ function LoadLevel() {
             //todo: end of game
         }
     });
-    global.char = char;
+    game.char = char;
     char.CreateBody();
     game.world.SetBodyPositionByZone(char.body, "player");
 

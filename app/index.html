@@ -5,22 +5,38 @@
     <title>Christmas Mario</title>
     <link rel="shortcut icon" href="files/img/favicon.ico" />
     <link rel="stylesheet" href="styles.css"/>
+    <style>
+        @font-face {
+            font-family: emulogic;
+            src: url(files/fonts/emulogic.ttf);
+        }
+    </style>
 </head>
 <body>
+    <div id="loader">
+        <div class="center-parent">
+            <div class="center-child">
+                <div id="loader_label">LOADING</div>
+                <div class="progress-bar blue stripes">
+                    <span style="width: 0%"></span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="ui">
         <div id="header">
-            <div id="sounds">
+            <div id="sounds" style="width: 15%">
                 <a href="#" id="sounds_button">&#128264;</a>
                 <a href="#" id="sounds_button_cancelled" style="display: none">&#128263;</a>
             </div>
-            <div>
-                Очки: <span id="points">0</span>
+            <div style="width: 25%">
+                <span id="points">0</span>
             </div>
-            <div>
-                Жизни: <span id="lifes">x3</span>
+            <div  style="width: 15%">
+                <img id="lifes_coin" src="files/img/coin.gif"/>&#10799;<span id="lifes">3</span>
             </div>
-            <div>
-                Время: <span id="timeleft">400</span>
+            <div  style="width: 30%">
+                time:<span id="timeleft">400</span>
             </div>
         </div>
 

@@ -73,11 +73,13 @@ module.exports = function(ctx, world) {
                 return;
             }
 
+            var x, y;
+
             if(body.renderer.image) {
                 var texture = _self.getTexture(body.renderer.image);
 
-                var x = _self.ctx.canvas.width/2 + ((body.physics.x+body.physics.width/2) - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
-                var y = _self.ctx.canvas.height/2 - ((body.physics.y-body.physics.height/2) - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
+                x = _self.ctx.canvas.width/2 + ((body.physics.x+body.physics.width/2) - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
+                y = _self.ctx.canvas.height/2 - ((body.physics.y-body.physics.height/2) - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
 
                 _self.ctx.translate(x, y);
                 if(body.renderer.angle) {
@@ -110,6 +112,16 @@ module.exports = function(ctx, world) {
                 _self.ctx.translate(-x, -y);
             } else if(_self.isDebug) {
                 _self.drawBodyRectangle(body)
+            }
+
+            if(body.renderer.label) {
+                x = _self.ctx.canvas.width/2 + ((body.physics.x+body.physics.width/2) - _self.camera.x) * _self.camera.zoomRate * map.tilewidth;
+                y = _self.ctx.canvas.height/2 - ((body.physics.y-body.physics.height/2) - _self.camera.y) * _self.camera.zoomRate * map.tileheight;
+
+                _self.ctx.font = body.renderer.label.font || "10px Arial";
+                _self.ctx.fillStyle = body.renderer.label.fillStyle || "black";
+                _self.ctx.textAlign = "center";
+                _self.ctx.fillText(body.renderer.label.text, x, y);
             }
 
             if(_self.isDebug) {

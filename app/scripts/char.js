@@ -71,8 +71,6 @@ module.exports = function(game, onCharDie) {
                 game.sounds.Play('powerup');
                 if(_self.marioMode === 'small') {
                     _self.setSuperMario();
-                } else {
-                    game.addGamePoints(1000)
                 }
                 _self.game.world.RemoveBody(event.object);
             }
