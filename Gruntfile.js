@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 		browserify: {
 			dist: {
 				files: {
-                    'www/scripts.min.js': 'app/scripts/**/*.js'
+                    'build/_browserify.js': 'app/scripts/**/*.js'
 				}
 			}
 		},
@@ -96,7 +96,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', [
 		'browserify',
-        //'uglify',
+        'uglify',
 		'sass',
 		'copy'
 	]);
